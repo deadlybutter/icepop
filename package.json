@@ -1,0 +1,19 @@
+{
+  "name": "icepop",
+  "version": "1.0.0",
+  "description": "Quickly bootstrap a Express+Mongoose API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deadlybutter/icepop.git"
+  },
+  "author": "Joe Kent",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deadlybutter/icepop/issues"
+  },
+  "homepage": "https://github.com/deadlybutter/icepop#readme"
+}
