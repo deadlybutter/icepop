@@ -97,10 +97,11 @@ module.exports = (definitions) => {
     const version = definitions.versions[versionKey];
 
     if (!version.active) {
-      router.get(`${routePrefix}*`, deprecatedHandler);
-      router.post(`${routePrefix}*`, deprecatedHandler);
-      router.put(`${routePrefix}*`, deprecatedHandler);
-      router.delete(`${routePrefix}*`, deprecatedHandler);
+      const wildcard = `${routePrefix}/*`;
+      router.get(wildcard, deprecatedHandler);
+      router.post(wildcard, deprecatedHandler);
+      router.put(wildcard, deprecatedHandler);
+      router.delete(wildcard, deprecatedHandler);
       return;
     }
 
