@@ -4,7 +4,8 @@
   "description": "Quickly bootstrap a Express+Mongoose API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "server": "nodemon test_server/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,9 @@
     "keypunch": "^1.0.5"
   },
   "devDependencies": {
-    "mongoose": "^4.8.4"
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "mongoose": "^4.8.4",
+    "supertest": "^3.0.0"
   }
 }
