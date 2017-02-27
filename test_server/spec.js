@@ -29,8 +29,6 @@ const testDog = new Dog({
   age: 4,
 });
 
-// testPerson.save().then(() => testDog.save());
-
 module.exports = {
   versions: {
     'v1': {
@@ -68,24 +66,3 @@ module.exports = {
     key: '123456789',
   }
 }
-
-/*
-
-# Security
- - Check endpoints that require auth
-
-
-# Versions
- - Check multiple versions are created
- - Check deprecation works
-
-# Query
- - Check pages are returned correctly
- - Check array is returned
- - Check query params from definitions work
-
-# Get
- - Check only 1 item is returned
- - Check fields from definitions work
-
- */

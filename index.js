@@ -48,7 +48,7 @@ function queryHandler(req, res) {
       });
     })
     .catch((err) => {
-      res.json({
+      res.status(500).json({
         error: true,
         message: err.message || 'the server had an error',
       });
@@ -84,7 +84,7 @@ function getHandler(req, res) {
       });
     })
     .catch((err) => {
-      res.json({
+      res.status(500).json({
         error: true,
         message: err.message || 'the server had an error',
       });
@@ -124,7 +124,7 @@ function createHandler(req, res) {
       });
     })
     .catch((err) => {
-      res.json({
+      res.status(500).json({
         error: true,
         message: err.message || 'the server had an error',
       });
@@ -179,7 +179,7 @@ function editHandler(req, res) {
       });
     })
     .catch((err) => {
-      res.json({
+      res.status(500).json({
         error: true,
         message: err.message || 'the server had an error',
       });
@@ -215,7 +215,7 @@ function deleteHandler(req, res) {
       })
     })
     .catch((err) => {
-      res.json({
+      res.status(500).json({
         error: true,
         message: err.message || 'the server had an error',
       });
@@ -228,7 +228,7 @@ module.exports = (definitions) => {
     return router;
   }
 
-  API_KEY = definitions.security.key;
+  API_KEY = definitions.security ? definitions.security.key : '';
 
   Object.keys(definitions.versions).forEach((versionKey) => {
     const routePrefix = `/${versionKey}`;
