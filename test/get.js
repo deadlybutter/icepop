@@ -11,7 +11,7 @@ const testSchema = new mongoose.Schema({
   content: String,
 });
 
-const Test = mongoose.model('test', testSchema);
+const Test = mongoose.model('get_test', testSchema);
 
 const test = new Test({
   title: 'Lorem',
