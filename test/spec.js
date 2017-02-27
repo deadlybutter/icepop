@@ -38,17 +38,27 @@ module.exports = {
       entities: [
         {
           id: 'dog',
-          get: ['_id', 'name'],
-          query: ['_id', 'name', 'owner'],
-          edit: ['name', 'owner', 'type', 'age'],
+          getBy: ['_id', 'name'],
+          queryBy: ['_id', 'name', 'owner'],
+          edit: {
+            by: ['_id'],
+            fields: ['name', 'owner', 'type', 'age'],
+          },
+          createFields: ['name', 'owner', 'type', 'age'],
+          deleteBy: ['_id'],
           populate: ['owner'],
           model: Dog,
         },
         {
           id: 'person',
-          query: ['name'],
-          get: ['name'],
-          edit: ['name'],
+          queryBy: ['name'],
+          getBy: ['name'],
+          edit: {
+            by: ['_id'],
+            fields: ['name'],
+          },
+          createFields: ['name'],
+          deleteBy: ['_id'],
           model: Person,
         },
       ],
@@ -58,3 +68,24 @@ module.exports = {
     key: '123456789',
   }
 }
+
+/*
+
+# Security
+ - Check endpoints that require auth
+
+
+# Versions
+ - Check multiple versions are created
+ - Check deprecation works
+
+# Query
+ - Check pages are returned correctly
+ - Check array is returned
+ - Check query params from definitions work
+
+# Get
+ - Check only 1 item is returned
+ - Check fields from definitions work
+
+ */
