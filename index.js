@@ -208,9 +208,7 @@ function deleteHandler(req, res) {
     .then((results) => {
       res.json({
         error: false,
-        data: {
-          deleted: results.result.ok === 1,
-        },
+        deleted: results.result.n > 0,
       })
     })
     .catch((err) => {

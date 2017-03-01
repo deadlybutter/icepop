@@ -37,8 +37,8 @@ const spec = {
 
 // pagination test
 
-describe('check get method works', function() {
-  it ('should get the model by _id', function() {
+describe('check query method works', function() {
+  it ('should query the model by _id', function() {
     const app = icepop(spec);
 
     return test.save()
