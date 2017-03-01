@@ -231,15 +231,6 @@ module.exports = (definitions) => {
     const routePrefix = `/${versionKey}`;
     const version = definitions.versions[versionKey];
 
-    if (!version.active) {
-      const wildcard = `${routePrefix}/*`;
-      router.get(wildcard, deprecatedHandler);
-      router.post(wildcard, deprecatedHandler);
-      router.put(wildcard, deprecatedHandler);
-      router.delete(wildcard, deprecatedHandler);
-      return;
-    }
-
     version.entities.forEach((entity) => {
       if (!entity.id) {
         console.error('An Entity is missing a ID');
@@ -248,6 +239,15 @@ module.exports = (definitions) => {
 
       if (!entity.model) {
         console.error(`${entity.id} is missing a model reference`);
+        return;
+      }
+
+      if (entity.deprecated) {
+        const wildcard = `${routePrefix}/${entity.id}/*`;
+        router.get(wildcard, deprecatedHandler);
+        router.post(wildcard, deprecatedHandler);
+        router.put(wildcard, deprecatedHandler);
+        router.delete(wildcard, deprecatedHandler);
         return;
       }
 
