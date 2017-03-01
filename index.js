@@ -152,7 +152,6 @@ function editHandler(req, res) {
 
   const query = {};
   query[requestedField] = requestedId;
-
   const populate = this.populate ? this.populate.join(' ') : '';
 
   this.model

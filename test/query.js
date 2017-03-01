@@ -35,12 +35,12 @@ const spec = {
   }
 };
 
-const app = icepop(spec);
-
 // pagination test
 
 describe('check get method works', function() {
   it ('should get the model by _id', function() {
+    const app = icepop(spec);
+
     return test.save()
     .then(() => {
       return request(app)
@@ -56,6 +56,8 @@ describe('check get method works', function() {
   });
 
   it ('should return multiple matching items', function() {
+    const app = icepop(spec);
+
     const test1 = new Test({
       title: 'a',
     });
@@ -80,6 +82,8 @@ describe('check get method works', function() {
   });
 
   it ('should not return anything for subtitle query', function() {
+    const app = icepop(spec);
+
     return test.save()
     .then(() => {
       return request(app)
@@ -93,6 +97,8 @@ describe('check get method works', function() {
   });
 
   it ('should throw an error for a fake ID', function() {
+    const app = icepop(spec);
+
     return test.save()
     .then(() => {
       return request(app)
@@ -109,6 +115,8 @@ describe('check get method works', function() {
 
 describe('verify pagination works', function() {
   it ('should paginate through multiple items', function() {
+    const app = icepop(spec);
+
     const models = [];
 
     for (let i = 0; i < 65; i++) {

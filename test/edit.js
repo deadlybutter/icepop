@@ -9,9 +9,13 @@ const responses = require('../lib/responses');
 const testSchema = new mongoose.Schema({
   title: String,
   content: String,
+  noEdit: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-const Test = mongoose.model('get_test', testSchema);
+const Test = mongoose.model('edit_test', testSchema);
 
 const test = new Test({
   title: 'Lorem',
@@ -25,38 +29,46 @@ const spec = {
       entities: [
         {
           id: 'test',
-          getBy: ['_id'],
+          edit: {
+            by: ['_id'],
+            fields: ['title', 'content'],
+          },
           model: Test,
         }
       ]
     }
+  },
+  security: {
+    key: '123',
   }
 };
 
-describe('check get method works', function() {
-  it ('should get the model by _id', function() {
+describe('check edit method works', function() {
+  it ('should edit the model by _id and change title', function() {
     const app = icepop(spec);
 
     return test.save()
     .then(() => {
       return request(app)
-        .get(`/v1/test/_id/${test._id}`)
+        .put(`/v1/test/_id/${test._id}`)
+        .send({key: '123', title: 'hmm'})
         .expect(200)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
           assert.isFalse(res.body.error, 'Did not recieve an error');
-          assert.equal(res.body.data.title, test.title, 'Titles match');
+          assert.equal(res.body.data.title, 'hmm', 'Titles match');
         });
     });
   });
 
-  it ('should not get the model by title', function() {
+  it ('should not edit the model by title', function() {
     const app = icepop(spec);
 
     return test.save()
     .then(() => {
       return request(app)
-        .get('/v1/test/title/sdfdsfds')
+        .put('/v1/test/title/sdfdsfds')
+        .send({key: '123'})
         .expect(responses.invalidField.status)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
@@ -65,33 +77,60 @@ describe('check get method works', function() {
     });
   });
 
-  it ('should throw an error for a fake ID', function() {
+  it ('should not edit the model if it gives the wrong data type', function() {
     const app = icepop(spec);
+    const t = new Test({
+      title: 'test',
+      content: 'content',
+    });
 
-    return test.save()
+    return t.save()
     .then(() => {
       return request(app)
-        .get('/v1/test/_id/sdfdsfds')
+        .put(`/v1/test/_id/${t._id}`)
+        .send({key: '123', title: {}})
         .expect(500)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
           assert.isTrue(res.body.error, 'Recieved error');
-          assert.isDefined(res.body.message, 'Recieved error message');
+          assert.include(res.body.message, 'validation failed', 'Got validation message');
         });
     });
   });
 
-  it ('should throw an error for a non existent ID', function() {
+  it ('should not edit the model for un-specified types', function() {
+    const app = icepop(spec);
+    const t = new Test({
+      title: 'test',
+      content: 'content',
+    });
+
+    return t.save()
+    .then(() => {
+      return request(app)
+        .put(`/v1/test/_id/${t._id}`)
+        .send({key: '123', noEdit: false})
+        .expect(200)
+        .then((res) => {
+          assert.isDefined(res.body, 'Recieved response');
+          assert.isFalse(res.body.error, 'Did not recieve an error');
+          assert.equal(res.body.data.noEdit, true, 'Field did not change');
+        });
+    });
+  });
+
+  it ('should not edit the model without a key', function() {
     const app = icepop(spec);
 
     return test.save()
     .then(() => {
       return request(app)
-        .get('/v1/test/_id/58b2370de956920cb856393c')
-        .expect(responses.entityNotFound.status)
+        .put(`/v1/test/_id/${test._id}`)
+        .send({title: 'hmm'})
+        .expect(responses.notAuthorized.status)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
-          assert.deepEqual(res.body, responses.entityNotFound.res, 'Correct error returned');
+          assert.deepEqual(res.body, responses.notAuthorized.res, 'Correct error returned');
         });
     });
   });
