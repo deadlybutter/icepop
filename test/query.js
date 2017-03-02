@@ -26,7 +26,6 @@ const Population = mongoose.model('PopulationQuery', populationTestSchema);
 const spec = {
   versions: {
     'v1': {
-      active: true,
       entities: [
         {
           id: 'test',

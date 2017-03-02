@@ -21,7 +21,6 @@ const test = new Test({
 const spec = {
   versions: {
     'v1': {
-      active: true,
       entities: [
         {
           id: 'test',

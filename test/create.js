@@ -20,7 +20,6 @@ const Test = mongoose.model('create_test', testSchema);
 const spec = {
   versions: {
     'v1': {
-      active: true,
       entities: [
         {
           id: 'test',
