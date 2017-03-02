@@ -12,13 +12,16 @@ const testSchema = new mongoose.Schema({
   content: String,
 });
 
-const Test = mongoose.model('query_test', testSchema);
+const Test = mongoose.model('Query', testSchema);
 
-const test = new Test({
-  title: 'Lorem',
-  subtitle: 'ipsum',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+const populationTestSchema = new mongoose.Schema({
+  thing: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Query',
+  }
 });
+
+const Population = mongoose.model('PopulationQuery', populationTestSchema);
 
 const spec = {
   versions: {
@@ -29,20 +32,25 @@ const spec = {
           id: 'test',
           queryBy: ['_id', 'title'],
           model: Test,
+        },
+        {
+          id: 'populate',
+          queryBy: ['_id'],
+          populate: ['thing'],
+          model: Population,
         }
       ]
     }
   }
 };
 
-// pagination test
-
 describe('check query method works', function() {
   it ('should query the model by _id', function() {
     const app = icepop(spec);
+    const title = 'yes';
 
-    return test.save()
-    .then(() => {
+    return new Test({ title }).save()
+    .then((test) => {
       return request(app)
         .get(`/v1/test?_id=${test._id}`)
         .expect(200)
@@ -50,7 +58,7 @@ describe('check query method works', function() {
           assert.isDefined(res.body, 'Recieved response');
           assert.isFalse(res.body.error, 'Did not recieve an error');
           assert.isArray(res.body.data, 'Recieved an array');
-          assert.equal(res.body.data[0].title, test.title, 'Titles match');
+          assert.equal(res.body.data[0].title, title, 'Titles match');
         });
     });
   });
@@ -84,14 +92,15 @@ describe('check query method works', function() {
   it ('should not return anything for subtitle query', function() {
     const app = icepop(spec);
 
-    return test.save()
+    return new Test({ title: 'uh' }).save()
+    .then(() => new Test({ title: 'uh', subtitle: 'ipsum' }).save())
     .then(() => {
       return request(app)
         .get('/v1/test?subtitle=ipsum')
         .expect(200)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
-          assert.lengthOf(res.body.data, 0, 'Recieved no data');
+          assert.lengthOf(res.body.data, 2, 'Recieved 2 items');
         });
     });
   });
@@ -99,7 +108,7 @@ describe('check query method works', function() {
   it ('should throw an error for a fake ID', function() {
     const app = icepop(spec);
 
-    return test.save()
+    return new Test({ title: 'uh' }).save()
     .then(() => {
       return request(app)
         .get('/v1/test?_id=fdsfds')
@@ -148,5 +157,32 @@ describe('verify pagination works', function() {
             assert.lengthOf(res.body.data, 7, 'Recieved 7 items');
           });
       });
+  });
+});
+
+describe('verify query population works', function() {
+  it ('should populate the model', function() {
+    const app = icepop(spec);
+    const title = 'the title';
+
+    return new Test({ title }).save()
+    .then((t) => {
+      const populate = new Population({
+        thing: t._id,
+      });
+
+      return populate.save();
+    })
+    .then((p) => {
+      return request(app)
+        .get(`/v1/populate?_id=${p._id}`)
+        .expect(200)
+        .then((res) => {
+          assert.isDefined(res.body, 'Recieved response');
+          assert.isFalse(res.body.error, 'Did not recieve an error');
+          assert.isObject(res.body.data[0].thing, 'Embedd was populated');
+          assert.equal(res.body.data[0].thing.title, title, 'Titles match');
+        });
+    });
   });
 });

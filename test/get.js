@@ -11,12 +11,16 @@ const testSchema = new mongoose.Schema({
   content: String,
 });
 
-const Test = mongoose.model('get_test', testSchema);
+const Test = mongoose.model('Get', testSchema);
 
-const test = new Test({
-  title: 'Lorem',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+const populationTestSchema = new mongoose.Schema({
+  thing: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Get',
+  }
 });
+
+const Population = mongoose.model('PopulationGet', populationTestSchema);
 
 const spec = {
   versions: {
@@ -27,6 +31,12 @@ const spec = {
           id: 'test',
           getBy: ['_id'],
           model: Test,
+        },
+        {
+          id: 'populate',
+          getBy: ['_id'],
+          populate: ['thing'],
+          model: Population,
         }
       ]
     }
@@ -36,16 +46,17 @@ const spec = {
 describe('check get method works', function() {
   it ('should get the model by _id', function() {
     const app = icepop(spec);
+    const title = 'yes';
 
-    return test.save()
-    .then(() => {
+    return new Test({ title }).save()
+    .then((test) => {
       return request(app)
         .get(`/v1/test/_id/${test._id}`)
         .expect(200)
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
           assert.isFalse(res.body.error, 'Did not recieve an error');
-          assert.equal(res.body.data.title, test.title, 'Titles match');
+          assert.equal(res.body.data.title, title, 'Titles match');
         });
     });
   });
@@ -53,7 +64,7 @@ describe('check get method works', function() {
   it ('should not get the model by title', function() {
     const app = icepop(spec);
 
-    return test.save()
+    return new Test({ title: 'fdsfs' }).save()
     .then(() => {
       return request(app)
         .get('/v1/test/title/sdfdsfds')
@@ -68,7 +79,7 @@ describe('check get method works', function() {
   it ('should throw an error for a fake ID', function() {
     const app = icepop(spec);
 
-    return test.save()
+    return new Test({ title: 'fdsfds' }).save()
     .then(() => {
       return request(app)
         .get('/v1/test/_id/sdfdsfds')
@@ -84,7 +95,7 @@ describe('check get method works', function() {
   it ('should throw an error for a non existent ID', function() {
     const app = icepop(spec);
 
-    return test.save()
+    return new Test({ title: 'fdsfds' }).save()
     .then(() => {
       return request(app)
         .get('/v1/test/_id/58b2370de956920cb856393c')
@@ -92,6 +103,33 @@ describe('check get method works', function() {
         .then((res) => {
           assert.isDefined(res.body, 'Recieved response');
           assert.deepEqual(res.body, responses.entityNotFound.res, 'Correct error returned');
+        });
+    });
+  });
+});
+
+describe('verify get population works', function() {
+  it ('should populate the model', function() {
+    const app = icepop(spec);
+    const title = 'the title';
+
+    return new Test({ title }).save()
+    .then((t) => {
+      const populate = new Population({
+        thing: t._id,
+      });
+
+      return populate.save();
+    })
+    .then((p) => {
+      return request(app)
+        .get(`/v1/populate/_id/${p._id}`)
+        .expect(200)
+        .then((res) => {
+          assert.isDefined(res.body, 'Recieved response');
+          assert.isFalse(res.body.error, 'Did not recieve an error');
+          assert.isObject(res.body.data.thing, 'Embedd was populated');
+          assert.equal(res.body.data.thing.title, title, 'Titles match');
         });
     });
   });
