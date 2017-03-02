@@ -32,7 +32,6 @@ const testDog = new Dog({
 module.exports = {
   versions: {
     'v1': {
-      active: true,
       entities: [
         {
           id: 'dog',
