@@ -56,7 +56,10 @@ app.use('/api', icepop(spec));
             fields: ['name', 'owner'], // These are fields you can actually change
           },
           deleteBy: ['_id'], // These are the fields you can query for for a delete. eg: DELETE /api/v1/cat/_id/123456789
-          populate: ['owner'], // These are fields that have embedded mongo documents and should be populated when queried
+          populate: { // These are fields that have embedded mongo documents and should be populated when queried
+            path: 'owner', // Path of the population field
+            model: 'Person', // Type of model being populated
+          },
           model: Cat, // The Mongoose object
           deprecated: true, // Indicate this model for this api scope is deprecated
         }

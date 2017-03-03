@@ -43,7 +43,10 @@ module.exports = {
           },
           createFields: ['name', 'owner', 'type', 'age'],
           deleteBy: ['_id'],
-          populate: ['owner'],
+          populate: {
+            path: 'owner',
+            model: 'Person',
+          },
           model: Dog,
         },
         {
