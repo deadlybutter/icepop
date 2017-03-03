@@ -35,7 +35,10 @@ const spec = {
         {
           id: 'populate',
           queryBy: ['_id'],
-          populate: ['thing'],
+          populate: {
+            path: 'thing',
+            model: 'Query',
+          },
           model: Population,
         }
       ]

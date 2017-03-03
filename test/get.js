@@ -34,7 +34,10 @@ const spec = {
         {
           id: 'populate',
           getBy: ['_id'],
-          populate: ['thing'],
+          populate: {
+            path: 'thing',
+            model: 'Get',
+          },
           model: Population,
         }
       ]
