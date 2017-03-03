@@ -23,7 +23,7 @@ function deprecatedHandler(req, res) {
 function queryHandler(req, res) {
   const query = {};
   const page = req.query.page || 1;
-  const populate = this.populate ? this.populate.join(' ') : '';
+  const populate = this.populate || '';
 
   Object.keys(req.query).forEach((fieldKey) => {
     if (this.queryBy.indexOf(fieldKey) !== -1) {
@@ -67,7 +67,7 @@ function getHandler(req, res) {
   const query = {};
   query[requestedField] = requestedId;
 
-  const populate = this.populate ? this.populate.join(' ') : '';
+  const populate = this.populate || '';
 
   this.model
     .findOne(query)
@@ -152,7 +152,7 @@ function editHandler(req, res) {
 
   const query = {};
   query[requestedField] = requestedId;
-  const populate = this.populate ? this.populate.join(' ') : '';
+  const populate = this.populate || '';
 
   this.model
     .findOne(query)
